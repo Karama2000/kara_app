@@ -1,0 +1,108 @@
+/* src/Styles/StudentLessons.css */
+.student-lessons {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.lessons-container {
+  display: flex;
+  gap: 20px;
+}
+
+.lessons-list {
+  width: 30%;
+}
+
+.lessons-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.lessons-list li {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd;
+}
+
+.lessons-list li.selected {
+  background-color: #e0f7fa;
+}
+
+.status {
+  float: right;
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: #fff;
+}
+
+.status.not_started { background-color: #ff9800; }
+.status.in_progress { background-color: #2196f3; }
+.status.completed { background-color: #4caf50; }
+
+.lesson-details {
+  width: 70%;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.pdf-viewer, .text-content {
+  margin-bottom: 20px;
+}
+
+.content-page {
+  min-height: 200px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 1px solid #007bff;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.progress-section {
+  margin-top: 20px;
+}
+
+.progress-section select,
+.progress-section textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+}
+
+.progress-section button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.progress-section button:hover {
+  background-color: #0056b3;
+}
+
+.error {
+  color: red;
+  margin-bottom: 10px;
+}

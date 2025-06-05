@@ -1,0 +1,269 @@
+/* Style général du conteneur principal */
+.manage-units-container {
+  max-width: 1400px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: linear-gradient(145deg, #ffffff, #f1f5f9);
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+/* Style de l'icône de retour */
+.back-icon {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 1.5rem;
+  color: #1f2937;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.back-icon:hover {
+  color: #3498db;
+  transform: scale(1.1);
+}
+
+/* Style du titre principal */
+.manage-units-title {
+  font-size: 2.5rem;
+  color: #111827;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Conteneur du filtre */
+.filter-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+/* Style du sélecteur de programme */
+.program-select {
+  padding: 0.9rem 1.5rem;
+  font-size: 1.1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 400px;
+  background-color: #fff;
+  color: #1f2937;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.program-select:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.4);
+  outline: none;
+}
+
+/* Style pour le chargement */
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  margin: 2rem 0;
+}
+
+/* Style pour les erreurs */
+.error {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #e74c3c;
+  background-color: #fee2e2;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+}
+
+/* Message pour aucune unité */
+.no-units-message {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Conteneur du bouton d'ajout */
+.add-unit-btn-container {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Style du bouton d'ajout */
+.add-unit-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.add-unit-btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+.add-unit-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.4);
+}
+
+/* Conteneur de la table */
+.table-container {
+  overflow-x: auto;
+}
+
+/* Style de la table */
+.units-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Style des en-têtes et cellules de la table */
+.units-table th,
+.units-table td {
+  padding: 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.units-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.units-table tr {
+  transition: background-color 0.3s ease;
+}
+
+.units-table tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Style des boutons d'action */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.edit-btn {
+  color: #3498db;
+}
+
+.edit-btn:hover {
+  color: #2980b9;
+  transform: scale(1.1);
+}
+
+.delete-btn {
+  color: #e74c3c;
+}
+
+.delete-btn:hover {
+  color: #c0392b;
+  transform: scale(1.1);
+}
+
+.view-btn {
+  color: #28a745;
+}
+
+.view-btn:hover {
+  color: #1e7e34;
+  transform: scale(1.1);
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .manage-units-container {
+    margin: 2rem;
+    padding: 1.5rem;
+  }
+
+  .manage-units-title {
+    font-size: 2rem;
+  }
+
+  .program-select {
+    max-width: 350px;
+  }
+
+  .units-table th,
+  .units-table td {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .manage-units-container {
+    margin: 1.5rem;
+    padding: 1rem;
+  }
+
+  .manage-units-title {
+    font-size: 1.8rem;
+  }
+
+  .program-select {
+    max-width: 100%;
+  }
+
+  .add-unit-btn {
+    width: 100%;
+    padding: 0.8rem;
+  }
+
+  .units-table th,
+  .units-table td {
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .manage-units-title {
+    font-size: 1.6rem;
+  }
+
+  .units-table th,
+  .units-table td {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
+
+  .action-btn {
+    font-size: 1rem;
+  }
+
+  .action-buttons {
+    gap: 0.5rem;
+  }
+}

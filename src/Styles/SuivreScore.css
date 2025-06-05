@@ -1,0 +1,51 @@
+
+
+.suivre-score-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.suivre-score-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.suivre-score-error {
+  color: red;
+  text-align: center;
+}
+
+.suivre-score-select {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.suivre-score-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.suivre-score-table th,
+.suivre-score-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.suivre-score-table th {
+  background-color: #f0f0f0;
+}
+
+.suivre-score-review-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

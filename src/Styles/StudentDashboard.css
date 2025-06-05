@@ -1,0 +1,241 @@
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --bg-light: #f4f7fa;
+  --bg-dark: #1a202c;
+  --text-light: #333;
+  --text-dark: #e2e8f0;
+  --card-bg-light: #fff;
+  --card-bg-dark: #2d3748;
+}
+
+.dashboard.student-dashboard {
+  min-height: 100vh;
+  background: var(--bg-light);
+  color: var(--text-light);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.student-dashboard.dark-mode {
+  background: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+.sidebar {
+  width: 250px;
+  background: var(--primary-color);
+  color: #fff;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 10;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    transform: translateX(0);
+  }
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  position: absolute;
+  top: 1rem;
+  right: -2rem;
+}
+
+.sidebar-content {
+  padding: 20px;
+}
+
+.sidebar-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sidebar-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-content li {
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s;
+}
+
+.sidebar-content li:hover {
+  background: #34495e;
+}
+
+.sidebar-content li.active {
+  background: var(--secondary-color);
+}
+
+.dashboard-header {
+  background: var(--secondary-color);
+  color: #fff;
+  padding: 1rem;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 5;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-messages, .btn-notification, .btn-theme-toggle, .btn-logout {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn-messages:hover, .btn-notification:hover, .btn-theme-toggle:hover {
+  color: #e2e8f0;
+}
+
+.message-badge, .notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #e53e3e;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+
+.dashboard-main {
+  padding: 80px 20px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-left: 0;
+}
+
+@media (min-width: 768px) {
+  .dashboard-main {
+    margin-left: 250px;
+  }
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.dashboard-subtitle.dark-mode {
+  color: #a0aec0;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-card {
+  background: var(--card-bg-light);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.student-dashboard.dark-mode .dashboard-card {
+  background: var(--card-bg-dark);
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon {
+  font-size: 2rem;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-card h3 {
+  margin: 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.dashboard-card p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.dashboard-card p.dark-mode {
+  color: #a0aec0;
+}
+
+.alert-error {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 0.75rem;
+  }
+  .header-title {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-main {
+    padding: 70px 10px 20px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}

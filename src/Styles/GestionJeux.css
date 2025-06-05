@@ -1,0 +1,98 @@
+.gestion-jeu-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.gestion-jeu-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.gestion-jeu-error {
+  color: red;
+  text-align: center;
+}
+
+.gestion-jeu-loading {
+  text-align: center;
+}
+
+.gestion-jeu-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.gestion-jeu-input {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.gestion-jeu-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.section-button {
+  background-color: #28a745;
+  color: white;
+}
+
+.game-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.edit-button {
+  background-color: #ffc107;
+  color: black;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+}
+
+.gestion-jeu-list {
+  margin-top: 20px;
+}
+
+.gestion-jeu-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.gestion-jeu-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gestion-jeu-games-list {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+.gestion-jeu-game-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}

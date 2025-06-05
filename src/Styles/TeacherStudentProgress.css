@@ -1,0 +1,151 @@
+.student-progress {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #1e2a3c;
+}
+
+.app-header {
+    background: linear-gradient(135deg, #1e2a3c 0%, #0f172a 100%);
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.app-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+}
+
+.back-button {
+    background: #3b82f6;
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+}
+
+.main-content {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.progress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.student-card {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.student-card:hover {
+    transform: translateY(-5px);
+}
+
+.student-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1e2a3c;
+}
+
+.student-card p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #4b5563;
+}
+
+.student-card p strong {
+    color: #1e2a3c;
+}
+
+.student-card h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 1.5rem 0 1rem;
+    color: #1e2a3c;
+}
+
+.student-card ul {
+    list-style: none;
+    padding: 0;
+}
+
+.student-card li {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    color: #4b5563;
+}
+
+.student-card li strong {
+    color: #1e2a3c;
+}
+
+.student-card li p {
+    margin: 0.3rem 0 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.media-link {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+.media-link:hover {
+    text-decoration: underline;
+}
+
+.no-data {
+    font-size: 1.1rem;
+    color: #6b7280;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+@media (max-width: 768px) {
+    .app-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .progress-grid {
+        grid-template-columns: 1fr;
+    }
+}

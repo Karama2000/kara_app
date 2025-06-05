@@ -1,0 +1,31 @@
+.logout-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.logout-btn {
+    background-color: #e06d79; /* Bootstrap-inspired danger red */
+    color: rgb(137, 2, 2);
+    border: none;
+    border-radius: 50%; /* Circular button */
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.logout-btn:hover {
+    background-color: #bf6871; /* Darker red on hover */
+    transform: scale(1.1); /* Slight zoom effect */
+}
+
+.logout-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3); /* Focus ring */
+}

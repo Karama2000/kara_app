@@ -1,0 +1,90 @@
+.add-user-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.back-icon {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+}
+
+.add-user-container h4 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 20px;
+}
+
+.add-user-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.add-user-container .MuiFormControl-root {
+  margin-bottom: 20px;
+}
+
+.add-user-container .MuiTextField-root,
+.add-user-container .MuiSelect-root {
+  width: 100%;
+}
+
+.add-user-container .MuiInputLabel-root {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.add-user-container .MuiInputBase-input {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.add-user-container .MuiButton-root {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  font-size: 16px;
+  text-transform: none;
+}
+
+.add-user-container .MuiButton-root:hover {
+  background-color: #0056b3;
+}
+
+.add-user-container .enfant-container {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+.add-user-container .enfant-container h6 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.add-user-container .MuiIconButton-root {
+  color: #dc3545;
+}
+
+.add-user-container .MuiIconButton-root:hover {
+  color: #b02a37;
+}
+
+.add-user-container .error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-bottom: 15px;
+}

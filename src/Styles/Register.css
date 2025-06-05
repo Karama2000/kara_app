@@ -1,0 +1,101 @@
+/* src/Components/Register.css */
+.register-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.register-page {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.register-box {
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    animation: slideUp 0.7s ease-out;
+}
+
+.register-box h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #27ae60;
+}
+
+.register-box input,
+.register-box select {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.register-box input:focus,
+.register-box select:focus {
+    border-color: #27ae60;
+}
+
+.error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+button {
+    width: 100%;
+    padding: 0.8rem;
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background: #219653;
+    transform: translateY(-2px);
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .register-box {
+        padding: 1.5rem;
+        max-width: 90%;
+    }
+    .register-box h2 {
+        font-size: 1.5rem;
+    }
+    .register-box input,
+    .register-box select {
+        font-size: 0.9rem;
+    }
+    button {
+        font-size: 0.9rem;
+    }
+}

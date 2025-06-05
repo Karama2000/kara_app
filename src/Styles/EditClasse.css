@@ -1,0 +1,66 @@
+.edit-classe-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.back-icon {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+}
+
+.edit-classe-container h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.edit-classe-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.edit-classe-container .MuiTextField-root,
+.edit-classe-container .MuiFormControl-root {
+  margin-bottom: 20px;
+}
+
+.edit-classe-container .MuiInputLabel-root {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.edit-classe-container .MuiInputBase-input,
+.edit-classe-container .MuiSelect-root {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.edit-classe-container .MuiButton-root {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  font-size: 16px;
+  text-transform: none;
+}
+
+.edit-classe-container .MuiButton-root:hover {
+  background-color: #0056b3;
+}
+
+.edit-classe-container .error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-bottom: 15px;
+}

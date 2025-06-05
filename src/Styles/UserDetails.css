@@ -1,0 +1,76 @@
+.user-details-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.back-icon {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+}
+
+.user-details-container h4 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 20px;
+}
+
+.user-details-container .MuiPaper-root {
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-details-container h6 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.user-details-container .MuiListItem-root {
+  padding: 10px 0;
+}
+
+.user-details-container .MuiListItemText-primary {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.user-details-container .MuiListItemText-secondary {
+  font-size: 14px;
+  color: #666;
+}
+
+.user-details-container .MuiDivider-root {
+  margin: 20px 0;
+}
+
+.user-details-container .loading {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.user-details-container .error,
+.user-details-container .warning {
+  font-size: 16px;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.user-details-container .error {
+  color: #dc3545;
+  background-color: #f8d7da;
+}
+
+.user-details-container .warning {
+  color: #856404;
+  background-color: #fff3cd;
+}

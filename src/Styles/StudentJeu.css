@@ -1,0 +1,113 @@
+.student-jeu-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.student-jeu-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.student-jeu-error {
+  color: red;
+  text-align: center;
+}
+
+.student-jeu-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.student-jeu-section-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f0f0f0;
+}
+
+.student-jeu-section-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.student-jeu-games {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.student-jeu-game-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+
+.student-jeu-game-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.student-jeu-game-title {
+  margin: 10px 0;
+}
+
+.student-jeu-play-button {
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.student-jeu-upload-section {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.student-jeu-input {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.student-jeu-upload-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.student-jeu-scores-section {
+  margin-top: 20px;
+}
+
+.student-jeu-scores-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.student-jeu-scores-table th,
+.student-jeu-scores-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.student-jeu-scores-table th {
+  background-color: #f0f0f0;
+}
