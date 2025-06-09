@@ -15,6 +15,7 @@ const GestionQuiz = () => {
       {
         enonce: '',
         type: 'true_false',
+        duration: 30, // Durée par défaut
         reponses: [
           { texte: 'True', estCorrecte: true, image: null, existingImage: null },
           { texte: 'False', estCorrecte: false, image: null, existingImage: null },
@@ -30,6 +31,8 @@ const GestionQuiz = () => {
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false); // État pour la modale
+  const [selectedQuiz, setSelectedQuiz] = useState(null); // Quiz à afficher dans la modale
 
   const fetchQuizzes = useCallback(async () => {
     try {
@@ -88,6 +91,9 @@ const GestionQuiz = () => {
       }
       if (!['multiple_choice', 'true_false', 'matching'].includes(q.type)) {
         newErrors[`question_${qIndex}_type`] = 'Type de question invalide';
+      }
+      if (!Number.isInteger(Number(q.duration)) || Number(q.duration) < 1) {
+        newErrors[`question_${qIndex}_duration`] = 'La durée doit être un nombre positif en secondes';
       }
       if (!Array.isArray(q.reponses) || q.reponses.length === 0) {
         newErrors[`question_${qIndex}_reponses`] = 'Au moins une réponse est requise';
@@ -172,6 +178,7 @@ const GestionQuiz = () => {
     const cleanQuestions = quiz.questions.map((q) => ({
       enonce: q.enonce,
       type: q.type,
+      duration: Number(q.duration), // Ajout de la durée
       reponses: q.reponses.map((r) => ({
         texte: r.texte,
         estCorrecte: r.estCorrecte,
@@ -216,6 +223,8 @@ const GestionQuiz = () => {
           ? prev.map((q) => (q._id === editingId ? response.data : q))
           : [...prev, response.data]
       );
+      setSelectedQuiz(response.data); // Afficher le quiz dans la modale
+      setShowModal(true); // Ouvre la modale
       setQuiz({
         titre: '',
         difficulty: 'facile',
@@ -223,6 +232,7 @@ const GestionQuiz = () => {
           {
             enonce: '',
             type: 'true_false',
+            duration: 30,
             reponses: [
               { texte: 'True', estCorrecte: true, image: null, existingImage: null },
               { texte: 'False', estCorrecte: false, image: null, existingImage: null },
@@ -255,6 +265,7 @@ const GestionQuiz = () => {
       questions: quizData.questions.map((q, qIndex) => ({
         enonce: q.enonce,
         type: q.type,
+        duration: q.duration || 30, // Charger la durée
         reponses: q.reponses.map((r, rIndex) => ({
           texte: r.texte,
           estCorrecte: r.estCorrecte,
@@ -273,6 +284,11 @@ const GestionQuiz = () => {
     setEditingId(quizData._id);
     setErrors({});
     setSuccess('');
+  };
+
+  const handleViewQuiz = (quizData) => {
+    setSelectedQuiz(quizData); // Sélectionne le quiz à afficher
+    setShowModal(true); // Ouvre la modale
   };
 
   const handleDelete = async (id) => {
@@ -305,6 +321,7 @@ const GestionQuiz = () => {
         {
           enonce: '',
           type: 'true_false',
+          duration: 30,
           reponses: [
             { texte: 'True', estCorrecte: true, image: null, existingImage: null, index: 0 },
             { texte: 'False', estCorrecte: false, image: null, existingImage: null, index: 1 },
@@ -436,155 +453,132 @@ const GestionQuiz = () => {
     }
   };
 
-return (
-  <div className="container mx-auto p-4 max-w-4xl">
-    <h2 className="text-2xl font-bold mb-6 text-center">
-      {editingId ? 'Modifier le Quiz' : 'Créer un Quiz'}
-    </h2>
-    
-    {/* Messages d'état */}
-    {isLoading && <p className="text-blue-500 text-center mb-4" aria-live="polite">Chargement...</p>}
-    {success && <p className="bg-green-100 text-green-700 p-3 rounded mb-4 text-center" aria-live="polite">{success}</p>}
-    {errors.submit && <p className="bg-red-100 text-red-700 p-3 rounded mb-4 text-center" aria-live="assertive">{errors.submit}</p>}
-    {errors.fetch && <p className="bg-red-100 text-red-700 p-3 rounded mb-4 text-center" aria-live="assertive">{errors.fetch}</p>}
-    {errors.delete && <p className="bg-red-100 text-red-700 p-3 rounded mb-4 text-center" aria-live="assertive">{errors.delete}</p>}
+  return (
+    <div className="container mx-auto p-4 max-w-4xl">
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        {editingId ? 'Modifier le Quiz' : 'Créer un Quiz'}
+      </h2>
 
-    <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-6">
-      {/* Titre du quiz */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="quiz-title">
-          Titre du quiz
-        </label>
-        <input
-          id="quiz-title"
-          type="text"
-          placeholder="Entrez le titre du quiz"
-          value={quiz.titre}
-          onChange={(e) => setQuiz({ ...quiz, titre: e.target.value })}
-          className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.titre ? 'border-red-500' : ''}`}
-          aria-invalid={!!errors.titre}
-          aria-describedby={errors.titre ? 'quiz-title-error' : undefined}
-        />
-        {errors.titre && <p id="quiz-title-error" className="text-red-500 text-xs italic mt-1">{errors.titre}</p>}
-      </div>
+      {isLoading && <p className="text-blue-500 text-center mb-4" aria-live="polite">Chargement...</p>}
+      {success && <p className="bg-green-100 text-green-700 p-3 rounded mb-4 text-center" aria-live="polite">{success}</p>}
+      {errors.submit && <p className="bg-red-100 text-red-700 p-3 rounded mb-4 text-center" aria-live="assertive">{errors.submit}</p>}
+      {errors.fetch && <p className="bg-red-100 text-red-700 p-3 rounded mb-4 text-center" aria-live="assertive">{errors.fetch}</p>}
+      {errors.delete && <p className="bg-red-100 text-red-700 p-3 rounded mb-4 text-center" aria-live="assertive">{errors.delete}</p>}
 
-      {/* Difficulté */}
-      <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="quiz-difficulty">
-          Niveau de difficulté
-        </label>
-        <select
-          id="quiz-difficulty"
-          value={quiz.difficulty}
-          onChange={(e) => setQuiz({ ...quiz, difficulty: e.target.value })}
-          className={`shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.difficulty ? 'border-red-500' : ''}`}
-          aria-invalid={!!errors.difficulty}
-          aria-describedby={errors.difficulty ? 'quiz-difficulty-error' : undefined}
-        >
-          <option value="facile">Facile</option>
-          <option value="moyen">Moyen</option>
-          <option value="difficile">Difficile</option>
-        </select>
-        {errors.difficulty && <p id="quiz-difficulty-error" className="text-red-500 text-xs italic mt-1">{errors.difficulty}</p>}
-      </div>
+      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-6">
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="quiz-title">
+            Titre du quiz
+          </label>
+          <input
+            id="quiz-title"
+            type="text"
+            placeholder="Entrez le titre du quiz"
+            value={quiz.titre}
+            onChange={(e) => setQuiz({ ...quiz, titre: e.target.value })}
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.titre ? 'border-red-500' : ''}`}
+            aria-invalid={!!errors.titre}
+            aria-describedby={errors.titre ? 'quiz-title-error' : undefined}
+          />
+          {errors.titre && <p id="quiz-title-error" className="text-red-500 text-xs italic mt-1">{errors.titre}</p>}
+        </div>
 
-      {/* Questions */}
-      {quiz.questions.map((q, qIndex) => (
-        <div key={qIndex} className="border border-gray-200 rounded-lg p-4 mb-6" role="region" aria-labelledby={`question-${qIndex}`}>
-          <h3 id={`question-${qIndex}`} className="text-lg font-semibold mb-4">Question {qIndex + 1}</h3>
-          
-          {/* Type de question */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={`question-type-${qIndex}`}>
-              Type de question
-            </label>
-            <select
-              id={`question-type-${qIndex}`}
-              value={q.type}
-              onChange={(e) => handleQuestionChange(qIndex, 'type', e.target.value)}
-              className={`shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors[`question_${qIndex}_type`] ? 'border-red-500' : ''}`}
-              aria-invalid={!!errors[`question_${qIndex}_type`]}
-              aria-describedby={errors[`question_${qIndex}_type`] ? `question-type-error-${qIndex}` : undefined}
-            >
-              <option value="true_false">Vrai/Faux</option>
-              <option value="multiple_choice">Choix multiples</option>
-              <option value="matching">Relier par flèche</option>
-            </select>
-            {errors[`question_${qIndex}_type`] && (
-              <p id={`question-type-error-${qIndex}`} className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_type`]}</p>
-            )}
-          </div>
+        <div className="mb-6">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="quiz-difficulty">
+            Niveau de difficulté
+          </label>
+          <select
+            id="quiz-difficulty"
+            value={quiz.difficulty}
+            onChange={(e) => setQuiz({ ...quiz, difficulty: e.target.value })}
+            className={`shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.difficulty ? 'border-red-500' : ''}`}
+            aria-invalid={!!errors.difficulty}
+            aria-describedby={errors.difficulty ? 'quiz-difficulty-error' : undefined}
+          >
+            <option value="facile">Facile</option>
+            <option value="moyen">Moyen</option>
+            <option value="difficile">Difficile</option>
+          </select>
+          {errors.difficulty && <p id="quiz-difficulty-error" className="text-red-500 text-xs italic mt-1">{errors.difficulty}</p>}
+        </div>
 
-          {/* Énoncé */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={`question-enonce-${qIndex}`}>
-              Énoncé
-            </label>
-            <input
-              id={`question-enonce-${qIndex}`}
-              type="text"
-              placeholder="Entrez l'énoncé de la question"
-              value={q.enonce}
-              onChange={(e) => handleQuestionChange(qIndex, 'enonce', e.target.value)}
-              className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors[`question_${qIndex}_enonce`] ? 'border-red-500' : ''}`}
-              aria-invalid={!!errors[`question_${qIndex}_enonce`]}
-              aria-describedby={errors[`question_${qIndex}_enonce`] ? `question-enonce-error-${qIndex}` : undefined}
-            />
-            {errors[`question_${qIndex}_enonce`] && (
-              <p id={`question-enonce-error-${qIndex}`} className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_enonce`]}</p>
-            )}
-          </div>
+        {quiz.questions.map((q, qIndex) => (
+          <div key={qIndex} className="border border-gray-200 rounded-lg p-4 mb-6" role="region" aria-labelledby={`question-${qIndex}`}>
+            <h3 id={`question-${qIndex}`} className="text-lg font-semibold mb-4">Question {qIndex + 1}</h3>
 
-          {/* Réponses */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Réponses</label>
-            
-            {q.type === 'true_false' ? (
-              <div className="space-y-2">
-                {q.reponses.map((r, rIndex) => (
-                  <div key={rIndex} className="flex items-center gap-4">
-                    <input 
-                      type="text" 
-                      value={r.texte} 
-                      readOnly 
-                      className="shadow appearance-none border rounded py-2 px-3 text-gray-700 bg-gray-100" 
-                    />
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name={`correct_${qIndex}`}
-                        checked={r.estCorrecte}
-                        onChange={() => handleResponseChange(qIndex, rIndex, 'estCorrecte', true)}
-                        className="form-radio h-4 w-4 text-blue-600"
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={`question-type-${qIndex}`}>
+                Type de question
+              </label>
+              <select
+                id={`question-type-${qIndex}`}
+                value={q.type}
+                onChange={(e) => handleQuestionChange(qIndex, 'type', e.target.value)}
+                className={`shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors[`question_${qIndex}_type`] ? 'border-red-500' : ''}`}
+                aria-invalid={!!errors[`question_${qIndex}_type`]}
+                aria-describedby={errors[`question_${qIndex}_type`] ? `question-type-error-${qIndex}` : undefined}
+              >
+                <option value="true_false">Vrai/Faux</option>
+                <option value="multiple_choice">Choix multiples</option>
+                <option value="matching">Relier par flèche</option>
+              </select>
+              {errors[`question_${qIndex}_type`] && (
+                <p id={`question-type-error-${qIndex}`} className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_type`]}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={`question-enonce-${qIndex}`}>
+                Énoncé
+              </label>
+              <input
+                id={`question-enonce-${qIndex}`}
+                type="text"
+                placeholder="Entrez l'énoncé de la question"
+                value={q.enonce}
+                onChange={(e) => handleQuestionChange(qIndex, 'enonce', e.target.value)}
+                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors[`question_${qIndex}_enonce`] ? 'border-red-500' : ''}`}
+                aria-invalid={!!errors[`question_${qIndex}_enonce`]}
+                aria-describedby={errors[`question_${qIndex}_enonce`] ? `question-enonce-error-${qIndex}` : undefined}
+              />
+              {errors[`question_${qIndex}_enonce`] && (
+                <p id={`question-enonce-error-${qIndex}`} className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_enonce`]}</p>
+              )}
+            </div>
+
+            {/* Champ Durée */}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={`question-duration-${qIndex}`}>
+                Durée (en secondes)
+              </label>
+              <input
+                id={`question-duration-${qIndex}`}
+                type="number"
+                min="1"
+                placeholder="Durée en secondes"
+                value={q.duration}
+                onChange={(e) => handleQuestionChange(qIndex, 'duration', e.target.value)}
+                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors[`question_${qIndex}_duration`] ? 'border-red-500' : ''}`}
+                aria-invalid={!!errors[`question_${qIndex}_duration`]}
+                aria-describedby={errors[`question_${qIndex}_duration`] ? `question-duration-error-${qIndex}` : undefined}
+              />
+              {errors[`question_${qIndex}_duration`] && (
+                <p id={`question-duration-error-${qIndex}`} className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_duration`]}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Réponses</label>
+              {q.type === 'true_false' ? (
+                <div className="space-y-2">
+                  {q.reponses.map((r, rIndex) => (
+                    <div key={rIndex} className="flex items-center gap-4">
+                      <input 
+                        type="text" 
+                        value={r.texte} 
+                        readOnly 
+                        className="shadow appearance-none border rounded py-2 px-3 text-gray-700 bg-gray-100" 
                       />
-                      <span>Correcte</span>
-                    </label>
-                  </div>
-                ))}
-                {errors[`question_${qIndex}_correct`] && (
-                  <p className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_correct`]}</p>
-                )}
-              </div>
-            ) : q.type === 'multiple_choice' ? (
-              <div className="space-y-4">
-                {q.reponses.map((r, rIndex) => (
-                  <div key={rIndex} className="border border-gray-200 rounded p-3">
-                    <div className="flex flex-wrap gap-4 mb-2">
-                      <input
-  type="text"
-  placeholder={`Réponse ${rIndex + 1}`}
-  value={r.texte}
-  onChange={(e) => handleResponseChange(qIndex, rIndex, 'texte', e.target.value)}
-  className={`shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-1 min-w-[200px] ${
-    errors[`response_${qIndex}_${rIndex}`] ? 'border-red-500' : ''
-  }`}
-  aria-invalid={!!errors[`response__${qIndex}_${rIndex}`]}
-  aria-describedby={
-    errors[`response_${qIndex}_${rIndex}`] 
-      ? `response-${qIndex}-${rIndex}-error` 
-      : undefined
-  }
-/>
                       <label className="flex items-center gap-2">
                         <input
                           type="radio"
@@ -592,393 +586,477 @@ return (
                           checked={r.estCorrecte}
                           onChange={() => handleResponseChange(qIndex, rIndex, 'estCorrecte', true)}
                           className="form-radio h-4 w-4 text-blue-600"
-                          aria-label={`Marquer la réponse ${rIndex + 1} comme correcte`}
                         />
                         <span>Correcte</span>
                       </label>
                     </div>
-
-                    {/* Image pour la réponse */}
-                    <div className="mb-2">
-                      <label className="block text-gray-700 text-sm mb-1">Image (optionnelle)</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => handleResponseChange(qIndex, rIndex, 'image', e.target.files[0])}
-                        className="block w-full text-sm text-gray-500
-                          file:mr-4 file:py-2 file:px-4
-                          file:rounded-md file:border-0
-                          file:text-sm file:font-semibold
-                          file:bg-blue-50 file:text-blue-700
-                          hover:file:bg-blue-100"
-                        aria-describedby={errors[`response_${qIndex}_${rIndex}_image`] ? `response-image-${qIndex}-${rIndex}-error` : undefined}
-                      />
-                      {r.existingImage && (
-                        <div className="mt-2 flex items-center gap-2">
-                          <img
-                            src={`https://kara-back.onrender.com/Uploads/${r.existingImage}`}
-                            alt={`Réponse ${rIndex + 1}`}
-                            className="h-16 object-contain border border-gray-200"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => clearMedia(qIndex, 'image', rIndex)}
-                            className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm"
-                            aria-label={`Supprimer l'image de la réponse ${rIndex + 1}`}
-                          >
-                            Supprimer
-                          </button>
-                        </div>
-                      )}
-                      {r.image && <p className="text-green-500 text-sm mt-1">Image ajoutée</p>}
-                      {errors[`response_${qIndex}_${rIndex}_image`] && (
-                        <p id={`response-image-${qIndex}-${rIndex}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${rIndex}_image`]}</p>
-                      )}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => removeResponse(qIndex, rIndex)}
-                      className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm"
-                      disabled={q.reponses.length <= 2}
-                      aria-label={`Supprimer la réponse ${rIndex + 1}`}
-                    >
-                      Supprimer cette réponse
-                    </button>
-                    {errors[`response_${qIndex}_${rIndex}`] && (
-                      <p id={`response-${qIndex}-${rIndex}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${rIndex}`]}</p>
-                    )}
-                  </div>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={() => addResponse(qIndex)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm mt-2"
-                  aria-label="Ajouter une nouvelle réponse"
-                >
-                  Ajouter une réponse
-                </button>
-
-                {errors[`question_${qIndex}_reponses`] && (
-                  <p className="text-red-500 text-xs italic mt-2">{errors[`question_${qIndex}_reponses`]}</p>
-                )}
-                {errors[`question_${qIndex}_correct`] && (
-                  <p className="text-red-500 text-xs italic mt-2">{errors[`question_${qIndex}_correct`]}</p>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-2 font-bold text-sm mb-2">
-                  <span>Élément gauche</span>
-                  <span></span>
-                  <span>Élément droit</span>
+                  ))}
+                  {errors[`question_${qIndex}_correct`] && (
+                    <p className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_correct`]}</p>
+                  )}
                 </div>
-                
-                {q.reponses
-                  .reduce((pairs, _, index, arr) => {
-                    if (index % 2 === 0) pairs.push([arr[index], arr[index + 1]]);
-                    return pairs;
-                  }, [])
-                  .map((pair, pairIndex) => (
-                    <div key={pairIndex} className="border border-gray-200 rounded p-3">
-                      <div className="grid grid-cols-3 gap-4 items-center">
-                        {/* Élément gauche */}
-                        <div>
+              ) : q.type === 'multiple_choice' ? (
+                <div className="space-y-4">
+                  {q.reponses.map((r, rIndex) => (
+                    <div key={rIndex} className="border border-gray-200 rounded p-3">
+                      <div className="flex flex-wrap gap-4 mb-2">
+                        <input
+                          type="text"
+                          placeholder={`Réponse ${rIndex + 1}`}
+                          value={r.texte}
+                          onChange={(e) => handleResponseChange(qIndex, rIndex, 'texte', e.target.value)}
+                          className={`shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-1 min-w-[200px] ${errors[`response_${qIndex}_${rIndex}`] ? 'border-red-500' : ''}`}
+                          aria-invalid={!!errors[`response_${qIndex}_${rIndex}`]}
+                          aria-describedby={errors[`response_${qIndex}_${rIndex}`] ? `response-${qIndex}-${rIndex}-error` : undefined}
+                        />
+                        <label className="flex items-center gap-2">
                           <input
-                            type="text"
-                            placeholder={`Gauche ${pairIndex + 1}`}
-                            value={pair[0].texte}
-                            onChange={(e) =>
-                              handleResponseChange(qIndex, pair[0].index, 'texte', e.target.value)
-                            }
-                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors[`response_${qIndex}_${pair[0].index}`] ? 'border-red-500' : ''}`}
-                            aria-invalid={!!errors[`response_${qIndex}_${pair[0].index}`]}
-                            aria-describedby={errors[`response_${qIndex}_${pair[0].index}`] ? `response-${qIndex}-${pair[0].index}-error` : undefined}
+                            type="radio"
+                            name={`correct_${qIndex}`}
+                            checked={r.estCorrecte}
+                            onChange={() => handleResponseChange(qIndex, rIndex, 'estCorrecte', true)}
+                            className="form-radio h-4 w-4 text-blue-600"
+                            aria-label={`Marquer la réponse ${rIndex + 1} comme correcte`}
                           />
-                          
-                          {/* Image gauche */}
-                          <div className="mt-2">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) =>
-                                handleResponseChange(qIndex, pair[0].index, 'image', e.target.files[0])
-                              }
-                              className="block w-full text-sm text-gray-500
-                                file:mr-4 file:py-1 file:px-2
-                                file:rounded-md file:border-0
-                                file:text-xs file:font-semibold
-                                file:bg-blue-50 file:text-blue-700
-                                hover:file:bg-blue-100"
-                              aria-describedby={errors[`response_${qIndex}_${pair[0].index}_image`] ? `response-image-${qIndex}_${pair[0].index}-error` : undefined}
-                            />
-                            {pair[0].existingImage && (
-                              <div className="mt-1 flex items-center gap-1">
-                                <img
-                                  src={`https://kara-back.onrender.com/Uploads/${pair[0].existingImage}`}
-                                  alt={`Gauche ${pairIndex + 1}`}
-                                  className="h-12 object-contain border border-gray-200"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => clearMedia(qIndex, 'image', pair[0].index)}
-                                  className="bg-red-500 hover:bg-red-700 text-white py-0.5 px-1 rounded text-xs"
-                                  aria-label={`Supprimer l'image de l'élément gauche ${pairIndex + 1}`}
-                                >
-                                  Supprimer
-                                </button>
-                              </div>
-                            )}
-                            {pair[0].image && <p className="text-green-500 text-xs mt-1">Image ajoutée</p>}
-                            {errors[`response_${qIndex}_${pair[0].index}_image`] && (
-                              <p id={`response-image-${qIndex}-${pair[0].index}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${pair[0].index}_image`]}</p>
-                            )}
-                          </div>
-                          
-                          {errors[`response_${qIndex}_${pair[0].index}`] && (
-                            <p id={`response-${qIndex}-${pair[0].index}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${pair[0].index}`]}</p>
-                          )}
-                        </div>
-
-                        {/* Flèche */}
-                        <div className="text-center text-xl">→</div>
-
-                        {/* Élément droit */}
-                        <div>
-                          <input
-                            type="text"
-                            placeholder={`Droit ${pairIndex + 1}`}
-                            value={pair[1].texte}
-                            onChange={(e) =>
-                              handleResponseChange(qIndex, pair[1].index, 'texte', e.target.value)
-                            }
-                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors[`response_${qIndex}_${pair[1].index}`] ? 'border-red-500' : ''}`}
-                            aria-invalid={!!errors[`response_${qIndex}_${pair[1].index}`]}
-                            aria-describedby={errors[`response_${qIndex}_${pair[1].index}`] ? `response-${qIndex}-${pair[1].index}-error` : undefined}
-                          />
-                          
-                          {/* Image droit */}
-                          <div className="mt-2">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) =>
-                                handleResponseChange(qIndex, pair[1].index, 'image', e.target.files[0])
-                              }
-                              className="block w-full text-sm text-gray-500
-                                file:mr-4 file:py-1 file:px-2
-                                file:rounded-md file:border-0
-                                file:text-xs file:font-semibold
-                                file:bg-blue-50 file:text-blue-700
-                                hover:file:bg-blue-100"
-                              aria-describedby={errors[`response_${qIndex}_${pair[1].index}_image`] ? `response-image-${qIndex}_${pair[1].index}-error` : undefined}
-                            />
-                            {pair[1].existingImage && (
-                              <div className="mt-1 flex items-center gap-1">
-                                <img
-                                  src={`https://kara-back.onrender.com/Uploads/${pair[1].existingImage}`}
-                                  alt={`Droit ${pairIndex + 1}`}
-                                  className="h-12 object-contain border border-gray-200"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => clearMedia(qIndex, 'image', pair[1].index)}
-                                  className="bg-red-500 hover:bg-red-700 text-white py-0.5 px-1 rounded text-xs"
-                                  aria-label={`Supprimer l'image de l'élément droit ${pairIndex + 1}`}
-                                >
-                                  Supprimer
-                                </button>
-                              </div>
-                            )}
-                            {pair[1].image && <p className="text-green-500 text-xs mt-1">Image ajoutée</p>}
-                            {errors[`response_${qIndex}_${pair[1].index}_image`] && (
-                              <p id={`response-image-${qIndex}-${pair[1].index}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${pair[1].index}_image`]}</p>
-                            )}
-                          </div>
-                          
-                          {errors[`response_${qIndex}_${pair[1].index}`] && (
-                            <p id={`response-${qIndex}-${pair[1].index}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${pair[1].index}`]}</p>
-                          )}
-                        </div>
+                          <span>Correcte</span>
+                        </label>
                       </div>
-
-                      <p className="text-sm text-gray-600 mt-2">
-                        Paire correcte : {pair[0].texte || 'Gauche'} → {pair[1].texte || 'Droit'}
-                      </p>
-
+                      <div className="mb-2">
+                        <label className="block text-gray-700 text-sm mb-1">Image (optionnelle)</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleResponseChange(qIndex, rIndex, 'image', e.target.files[0])}
+                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                          aria-describedby={errors[`response_${qIndex}_${rIndex}_image`] ? `response-image-${qIndex}-${rIndex}-error` : undefined}
+                        />
+                        {r.existingImage && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <img
+                              src={`https://kara-back.onrender.com/Uploads/${r.existingImage}`}
+                              alt={`Réponse ${rIndex + 1}`}
+                              className="h-16 object-contain border border-gray-200"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => clearMedia(qIndex, 'image', rIndex)}
+                              className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm"
+                              aria-label={`Supprimer l'image de la réponse ${rIndex + 1}`}
+                            >
+                              Supprimer
+                            </button>
+                          </div>
+                        )}
+                        {r.image && <p className="text-green-500 text-sm mt-1">Image ajoutée</p>}
+                        {errors[`response_${qIndex}_${rIndex}_image`] && (
+                          <p id={`response-image-${qIndex}-${rIndex}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${rIndex}_image`]}</p>
+                        )}
+                      </div>
                       <button
                         type="button"
-                        onClick={() => removeResponse(qIndex, pair[0].index)}
-                        className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm mt-2"
-                        disabled={q.reponses.length <= 4}
-                        aria-label={`Supprimer la paire ${pairIndex + 1}`}
+                        onClick={() => removeResponse(qIndex, rIndex)}
+                        className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm"
+                        disabled={q.reponses.length <= 2}
+                        aria-label={`Supprimer la réponse ${rIndex + 1}`}
                       >
-                        Supprimer la paire
+                        Supprimer cette réponse
                       </button>
+                      {errors[`response_${qIndex}_${rIndex}`] && (
+                        <p id={`response-${qIndex}-${rIndex}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${rIndex}`]}</p>
+                      )}
                     </div>
                   ))}
-
-                <button
-                  type="button"
-                  onClick={() => addMatchingPair(qIndex)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm mt-2"
-                  aria-label="Ajouter une nouvelle paire"
-                >
-                  Ajouter une paire
-                </button>
-
-                {errors[`question_${qIndex}_reponses`] && (
-                  <p className="text-red-500 text-xs italic mt-2">{errors[`question_${qIndex}_reponses`]}</p>
-                )}
-                {Object.keys(errors)
-                  .filter((key) => key.startsWith(`question_${qIndex}_pair_`))
-                  .map((key) => (
-                    <p key={key} className="text-red-500 text-xs italic mt-1">{errors[key]}</p>
-                  ))}
-              </div>
-            )}
-          </div>
-
-          {/* Médias pour la question */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Médias (optionnels)</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Image */}
-              <div>
-                <label className="block text-gray-700 text-sm mb-1">Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleQuestionChange(qIndex, 'image', e.target.files[0])}
-                  className="block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-md file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-50 file:text-blue-700
-                    hover:file:bg-blue-100"
-                  aria-describedby={errors[`question_${qIndex}_image`] ? `question-image-${qIndex}-error` : undefined}
-                />
-                {q.existingImage && (
-                  <div className="mt-2 flex items-start gap-2">
-                    <img
-                      src={`https://kara-back.onrender.com/Uploads/${q.existingImage}`}
-                      alt={`Question ${qIndex + 1}`}
-                      className="h-20 object-contain border border-gray-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => clearMedia(qIndex, 'image')}
-                      className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm"
-                      aria-label={`Supprimer l'image de la question ${qIndex + 1}`}
-                    >
-                      Supprimer
-                    </button>
+                  <button
+                    type="button"
+                    onClick={() => addResponse(qIndex)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm mt-2"
+                    aria-label="Ajouter une nouvelle réponse"
+                  >
+                    Ajouter une réponse
+                  </button>
+                  {errors[`question_${qIndex}_reponses`] && (
+                    <p className="text-red-500 text-xs italic mt-2">{errors[`question_${qIndex}_reponses`]}</p>
+                  )}
+                  {errors[`question_${qIndex}_correct`] && (
+                    <p className="text-red-500 text-xs italic mt-2">{errors[`question_${qIndex}_correct`]}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-2 font-bold text-sm mb-2">
+                    <span>Élément gauche</span>
+                    <span></span>
+                    <span>Élément droit</span>
                   </div>
-                )}
-                {q.image && <p className="text-green-500 text-sm mt-1">Image ajoutée pour la question</p>}
-                {errors[`question_${qIndex}_image`] && (
-                  <p id={`question-image-${qIndex}-error`} className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_image`]}</p>
-                )}
-              </div>
+                  {q.reponses
+                    .reduce((pairs, _, index, arr) => {
+                      if (index % 2 === 0) pairs.push([arr[index], arr[index + 1]]);
+                      return pairs;
+                    }, [])
+                    .map((pair, pairIndex) => (
+                      <div key={pairIndex} className="border border-gray-200 rounded p-3">
+                        <div className="grid grid-cols-3 gap-4 items-center">
+                          <div>
+                            <input
+                              type="text"
+                              placeholder={`Gauche ${pairIndex + 1}`}
+                              value={pair[0].texte}
+                              onChange={(e) =>
+                                handleResponseChange(qIndex, pair[0].index, 'texte', e.target.value)
+                              }
+                              className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors[`response_${qIndex}_${pair[0].index}`] ? 'border-red-500' : ''}`}
+                              aria-invalid={!!errors[`response_${qIndex}_${pair[0].index}`]}
+                              aria-describedby={errors[`response_${qIndex}_${pair[0].index}`] ? `response-${qIndex}-${pair[0].index}-error` : undefined}
+                            />
+                            <div className="mt-2">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) =>
+                                  handleResponseChange(qIndex, pair[0].index, 'image', e.target.files[0])
+                                }
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                aria-describedby={errors[`response_${qIndex}_${pair[0].index}_image`] ? `response-image-${qIndex}_${pair[0].index}-error` : undefined}
+                              />
+                              {pair[0].existingImage && (
+                                <div className="mt-1 flex items-center gap-1">
+                                  <img
+                                    src={`https://kara-back.onrender.com/Uploads/${pair[0].existingImage}`}
+                                    alt={`Gauche ${pairIndex + 1}`}
+                                    className="h-12 object-contain border border-gray-200"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => clearMedia(qIndex, 'image', pair[0].index)}
+                                    className="bg-red-500 hover:bg-red-700 text-white py-0.5 px-1 rounded text-xs"
+                                    aria-label={`Supprimer l'image de l'élément gauche ${pairIndex + 1}`}
+                                  >
+                                    Supprimer
+                                  </button>
+                                </div>
+                              )}
+                              {pair[0].image && <p className="text-green-500 text-xs mt-1">Image ajoutée</p>}
+                              {errors[`response_${qIndex}_${pair[0].index}_image`] && (
+                                <p id={`response-image-${qIndex}-${pair[0].index}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${pair[0].index}_image`]}</p>
+                              )}
+                            </div>
+                            {errors[`response_${qIndex}_${pair[0].index}`] && (
+                              <p id={`response-${qIndex}-${pair[0].index}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${pair[0].index}`]}</p>
+                            )}
+                          </div>
+                          <div className="text-center text-xl">→</div>
+                          <div>
+                            <input
+                              type="text"
+                              placeholder={`Droit ${pairIndex + 1}`}
+                              value={pair[1].texte}
+                              onChange={(e) =>
+                                handleResponseChange(qIndex, pair[1].index, 'texte', e.target.value)
+                              }
+                              className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors[`response_${qIndex}_${pair[1].index}`] ? 'border-red-500' : ''}`}
+                              aria-invalid={!!errors[`response_${qIndex}_${pair[1].index}`]}
+                              aria-describedby={errors[`response_${qIndex}_${pair[1].index}`] ? `response-${qIndex}-${pair[1].index}-error` : undefined}
+                            />
+                            <div className="mt-2">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) =>
+                                  handleResponseChange(qIndex, pair[1].index, 'image', e.target.files[0])
+                                }
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                aria-describedby={errors[`response_${qIndex}_${pair[1].index}_image`] ? `response-image-${qIndex}_${pair[1].index}-error` : undefined}
+                              />
+                              {pair[1].existingImage && (
+                                <div className="mt-1 flex items-center gap-1">
+                                  <img
+                                    src={`https://kara-back.onrender.com/Uploads/${pair[1].existingImage}`}
+                                    alt={`Droit ${pairIndex + 1}`}
+                                    className="h-12 object-contain border border-gray-200"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => clearMedia(qIndex, 'image', pair[1].index)}
+                                    className="bg-red-500 hover:bg-red-700 text-white py-0.5 px-1 rounded text-xs"
+                                    aria-label={`Supprimer l'image de l'élément droit ${pairIndex + 1}`}
+                                  >
+                                    Supprimer
+                                  </button>
+                                </div>
+                              )}
+                              {pair[1].image && <p className="text-green-500 text-xs mt-1">Image ajoutée</p>}
+                              {errors[`response_${qIndex}_${pair[1].index}_image`] && (
+                                <p id={`response-image-${qIndex}-${pair[1].index}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${pair[1].index}_image`]}</p>
+                              )}
+                            </div>
+                            {errors[`response_${qIndex}_${pair[1].index}`] && (
+                              <p id={`response-${qIndex}-${pair[1].index}-error`} className="text-red-500 text-xs italic mt-1">{errors[`response_${qIndex}_${pair[1].index}`]}</p>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-2">
+                          Paire correcte : {pair[0].texte || 'Gauche'} → {pair[1].texte || 'Droit'}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => removeResponse(qIndex, pair[0].index)}
+                          className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm mt-2"
+                          disabled={q.reponses.length <= 4}
+                          aria-label={`Supprimer la paire ${pairIndex + 1}`}
+                        >
+                          Supprimer la paire
+                        </button>
+                      </div>
+                    ))}
+                  <button
+                    type="button"
+                    onClick={() => addMatchingPair(qIndex)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm mt-2"
+                    aria-label="Ajouter une nouvelle paire"
+                  >
+                    Ajouter une paire
+                  </button>
+                  {errors[`question_${qIndex}_reponses`] && (
+                    <p className="text-red-500 text-xs italic mt-2">{errors[`question_${qIndex}_reponses`]}</p>
+                  )}
+                  {Object.keys(errors)
+                    .filter((key) => key.startsWith(`question_${qIndex}_pair_`))
+                    .map((key) => (
+                      <p key={key} className="text-red-500 text-xs italic mt-1">{errors[key]}</p>
+                    ))}
+                </div>
+              )}
+            </div>
 
-              {/* Audio */}
-              <div>
-                <label className="block text-gray-700 text-sm mb-1">Audio</label>
-                <AudioRecorder
-                  onAudioRecorded={(blob) => handleQuestionChange(qIndex, 'audio', blob)}
-                />
-                {q.existingAudio && (
-                  <div className="mt-2 flex items-start gap-2">
-                    <audio
-                      controls
-                      src={`https://kara-back.onrender.com/Uploads/${q.existingAudio}`}
-                      className="h-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => clearMedia(qIndex, 'audio')}
-                      className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm"
-                      aria-label={`Supprimer l'audio de la question ${qIndex + 1}`}
-                    >
-                      Supprimer
-                    </button>
-                  </div>
-                )}
-                {q.audio && <p className="text-green-500 text-sm mt-1">Audio ajouté pour la question</p>}
-                {errors[`question_${qIndex}_audio`] && (
-                  <p id={`question-audio-${qIndex}-error`} className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_audio`]}</p>
-                )}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Médias (optionnels)</label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-700 text-sm mb-1">Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleQuestionChange(qIndex, 'image', e.target.files[0])}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    aria-describedby={errors[`question_${qIndex}_image`] ? `question-image-${qIndex}-error` : undefined}
+                  />
+                  {q.existingImage && (
+                    <div className="mt-2 flex items-start gap-2">
+                      <img
+                        src={`https://kara-back.onrender.com/Uploads/${q.existingImage}`}
+                        alt={`Question ${qIndex + 1}`}
+                        className="h-20 object-contain border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => clearMedia(qIndex, 'image')}
+                        className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm"
+                        aria-label={`Supprimer l'image de la question ${qIndex + 1}`}
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  )}
+                  {q.image && <p className="text-green-500 text-sm mt-1">Image ajoutée pour la question</p>}
+                  {errors[`question_${qIndex}_image`] && (
+                    <p id={`question-image-${qIndex}-error`} className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_image`]}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-gray-700 text-sm mb-1">Audio</label>
+                  <AudioRecorder
+                    onAudioRecorded={(blob) => handleQuestionChange(qIndex, 'audio', blob)}
+                  />
+                  {q.existingAudio && (
+                    <div className="mt-2 flex items-start gap-2">
+                      <audio
+                        controls
+                        src={`https://kara-back.onrender.com/Uploads/${q.existingAudio}`}
+                        className="h-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => clearMedia(qIndex, 'audio')}
+                        className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded text-sm"
+                        aria-label={`Supprimer l'audio de la question ${qIndex + 1}`}
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  )}
+                  {q.audio && <p className="text-green-500 text-sm mt-1">Audio ajouté pour la question</p>}
+                  {errors[`question_${qIndex}_audio`] && (
+                    <p id={`question-audio-${qIndex}-error`} className="text-red-500 text-xs italic mt-1">{errors[`question_${qIndex}_audio`]}</p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
 
-          <button
-            type="button"
-            onClick={() => removeQuestion(qIndex)}
-            className="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded"
-            disabled={quiz.questions.length === 1}
-            aria-label={`Supprimer la question ${qIndex + 1}`}
+            <button
+              type="button"
+              onClick={() => removeQuestion(qIndex)}
+              className="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded"
+              disabled={quiz.questions.length === 1}
+              aria-label={`Supprimer la question ${qIndex + 1}`}
+            >
+              Supprimer la question
+            </button>
+          </div>
+        ))}
+
+        <div className="flex justify-between mt-6">
+          <button 
+            type="button" 
+            onClick={addQuestion} 
+            className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded"
+            aria-label="Ajouter une nouvelle question"
           >
-            Supprimer la question
+            Ajouter une question
+          </button>
+          <button 
+            type="submit" 
+            className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:opacity-50"
+            disabled={isLoading}
+            aria-label={editingId ? 'Modifier le quiz' : 'Créer le quiz'}
+          >
+            {editingId ? 'Modifier' : 'Créer'} le quiz
           </button>
         </div>
-      ))}
+      </form>
 
-      <div className="flex justify-between mt-6">
-        <button 
-          type="button" 
-          onClick={addQuestion} 
-          className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 rounded"
-          aria-label="Ajouter une nouvelle question"
-        >
-          Ajouter une question
-        </button>
-        
-        <button 
-          type="submit" 
-          className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:opacity-50" 
-          disabled={isLoading}
-          aria-label={editingId ? 'Modifier le quiz' : 'Créer le quiz'}
-        >
-          {editingId ? 'Modifier' : 'Créer'} le quiz
-        </button>
-      </div>
-    </form>
+      {/* Modale pour visualiser le quiz */}
+      {showModal && selectedQuiz && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-4 text-center">{selectedQuiz.titre}</h2>
+            <p className="text-gray-600 mb-4 text-center">Difficulté: {selectedQuiz.difficulty}</p>
+            {selectedQuiz.questions.map((q, qIndex) => (
+              <div key={qIndex} className="border border-gray-200 rounded-lg p-4 mb-4">
+                <h3 className="text-lg font-semibold mb-2">Question {qIndex + 1}: {q.enonce}</h3>
+                <p className="text-gray-600 mb-2">Type: {q.type}</p>
+                <p className="text-gray-600 mb-2">Durée: {q.duration} secondes</p>
+                {q.imageUrl && (
+                  <img
+                    src={`https://kara-back.onrender.com/Uploads/${q.imageUrl}`}
+                    alt={`Question ${qIndex + 1}`}
+                    className="h-20 object-contain border border-gray-200 my-2"
+                  />
+                )}
+                {q.audioUrl && (
+                  <audio
+                    controls
+                    src={`https://kara-back.onrender.com/Uploads/${q.audioUrl}`}
+                    className="w-full my-2"
+                  />
+                )}
+                <div className="mt-2">
+                  <p className="font-semibold">Réponses:</p>
+                  {q.type === 'matching' ? (
+                    <div className="grid grid-cols-3 gap-2">
+                      <span className="font-bold">Gauche</span>
+                      <span></span>
+                      <span className="font-bold">Droit</span>
+                      {q.reponses
+                        .reduce((pairs, _, index, arr) => {
+                          if (index % 2 === 0) pairs.push([arr[index], arr[index + 1]]);
+                          return pairs;
+                        }, [])
+                        .map((pair, pairIndex) => (
+                          <React.Fragment key={pairIndex}>
+                            <div>
+                              <p>{pair[0].texte}</p>
+                              {pair[0].imageUrl && (
+                                <img
+                                  src={`https://kara-back.onrender.com/Uploads/${pair[0].imageUrl}`}
+                                  alt={`Gauche ${pairIndex + 1}`}
+                                  className="h-12 object-contain border border-gray-200 my-1"
+                                />
+                              )}
+                            </div>
+                            <div className="text-center">→</div>
+                            <div>
+                              <p>{pair[1].texte}</p>
+                              {pair[1].imageUrl && (
+                                <img
+                                  src={`https://kara-back.onrender.com/Uploads/${pair[1].imageUrl}`}
+                                  alt={`Droit ${pairIndex + 1}`}
+                                  className="h-12 object-contain border border-gray-200 my-1"
+                                />
+                              )}
+                            </div>
+                          </React.Fragment>
+                        ))}
+                    </div>
+                  ) : (
+                    <ul className="space-y-2">
+                      {q.reponses.map((r, rIndex) => (
+                        <li key={rIndex} className={r.estCorrecte ? 'text-green-600 font-semibold' : ''}>
+                          {r.texte} {r.estCorrecte && '(Correcte)'}
+                          {r.imageUrl && (
+                            <img
+                              src={`https://kara-back.onrender.com/Uploads/${r.imageUrl}`}
+                              alt={`Réponse ${rIndex + 1}`}
+                              className="h-12 object-contain border border-gray-200 my-1"
+                            />
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setShowModal(false)}
+              className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded mt-4 mx-auto block"
+              aria-label="Fermer la fenêtre de visualisation"
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
 
-    {/* Liste des quiz */}
-    <h2 className="text-2xl font-bold mb-4 text-center">Liste des Quiz</h2>
-    {quizzes.length === 0 ? (
-      <p className="text-center text-gray-500">Aucun quiz trouvé.</p>
-    ) : (
-      <ul className="space-y-2">
-        {quizzes.map((q) => (
-          <li key={q._id} className="bg-white shadow rounded-lg p-4 flex justify-between items-center">
-            <span className="font-medium">
-              {q.titre} <span className="text-gray-600">({q.difficulty})</span>
-            </span>
-            <div className="space-x-2">
-              <button 
-                onClick={() => handleEdit(q)} 
-                className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded text-sm"
-                aria-label={`Modifier le quiz ${q.titre}`}
-              >
-                Modifier
-              </button>
-              <button 
-                onClick={() => handleDelete(q._id)} 
-                className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm"
-                aria-label={`Supprimer le quiz ${q.titre}`}
-              >
-                Supprimer
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-);
+      <h2 className="text-2xl font-bold mb-4 text-center">Liste des Quiz</h2>
+      {quizzes.length === 0 ? (
+        <p className="text-center text-gray-500">Aucun quiz trouvé.</p>
+      ) : (
+        <ul className="space-y-2">
+          {quizzes.map((q) => (
+            <li key={q._id} className="bg-white shadow rounded-lg p-4 flex justify-between items-center">
+              <span className="font-medium">
+                {q.titre} <span className="text-gray-600">({q.difficulty})</span>
+              </span>
+              <div className="space-x-2">
+                <button 
+                  onClick={() => handleViewQuiz(q)} 
+                  className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded text-sm"
+                  aria-label={`Voir le quiz ${q.titre}`}
+                >
+                  Voir
+                </button>
+                <button 
+                  onClick={() => handleEdit(q)} 
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded text-sm"
+                  aria-label={`Modifier le quiz ${q.titre}`}
+                >
+                  Modifier
+                </button>
+                <button 
+                  onClick={() => handleDelete(q._id)} 
+                  className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm"
+                  aria-label={`Supprimer le quiz ${q.titre}`}
+                >
+                  Supprimer
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 };
 
 export default GestionQuiz;

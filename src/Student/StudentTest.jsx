@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'https://cdn.jsdelivr.net/npm/axios@1.7.2/+esm';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faUpload, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faUpload, faDownload, faTrash } from '@fortawesome/free-solid-svg-icons';
 import '../Styles/StudentTests.css';
 
 const StudentTests = () => {
@@ -16,6 +16,8 @@ const StudentTests = () => {
   const [submissionForm, setSubmissionForm] = useState({
     testId: '',
     submittedFile: null,
+    submissionId: '',
+    isEditing: false,
   });
 
   useEffect(() => {
@@ -26,10 +28,10 @@ const StudentTests = () => {
           headers: { Authorization: `Bearer ${token}` },
         };
         const response = await axios.get('https://kara-back.onrender.com/api/student/tests', config);
-        console.log('Tests response:', response.data);
+        console.log('Tests reçus:', JSON.stringify(response.data, null, 2));
         setTests(response.data);
       } catch (error) {
-        console.error('Error fetching tests:', error.response?.data || error.message);
+        console.error('Erreur lors de la récupération des tests:', error);
         setError(error.response?.data?.message || 'Erreur lors du chargement des tests.');
         if (error.response?.status === 401) {
           localStorage.clear();
@@ -43,6 +45,7 @@ const StudentTests = () => {
     if (token) {
       fetchTests();
     } else {
+      setError('Aucun token trouvé. Veuillez vous connecter.');
       navigate('/login');
     }
   }, [token, navigate]);
@@ -52,7 +55,7 @@ const StudentTests = () => {
     setError('');
   };
 
-  const handleSubmit = async (e, testId) => {
+  const handleSubmit = async (e, testId, submissionId = null) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -61,11 +64,10 @@ const StudentTests = () => {
     try {
       const formData = new FormData();
       formData.append('testId', testId);
-      if (submissionForm.submittedFile) {
-        formData.append('submittedFile', submissionForm.submittedFile);
-      } else {
+      if (!submissionForm.submittedFile) {
         throw new Error('Aucun fichier sélectionné.');
       }
+      formData.append('submittedFile', submissionForm.submittedFile);
 
       const config = {
         headers: {
@@ -73,28 +75,64 @@ const StudentTests = () => {
           'Content-Type': 'multipart/form-data',
         },
       };
-      const response = await axios.post('https://kara-back.onrender.com/api/student/tests/submit', formData, config);
-      console.log('Submission response:', response.data);
+
+      let response;
+      if (submissionId && submissionForm.isEditing) {
+        response = await axios.put(`https://kara-back.onrender.com/api/student/tests/submission/${submissionId}`, formData, config);
+      } else {
+        response = await axios.post('https://kara-back.onrender.com/api/student/tests/submit', formData, config);
+      }
 
       setTests(tests.map(test =>
         test._id === testId
-          ? {
-              ...test,
-              submission: {
-                status: response.data.status || 'submitted', // Use status from response
-                submittedFile: response.data.submittedFile,
-                submittedAt: new Date(response.data.submittedAt),
-                feedback: response.data.feedback || 'Aucun feedback'
-              }
-            }
+          ? { ...test, submission: response.data }
           : test
       ));
-      setSuccess(`Test soumis avec succès. ${response.data.notificationWarnings || ''}`);
-      setSubmissionForm({ testId: '', submittedFile: null });
+      setSuccess(`Soumission ${submissionId && submissionForm.isEditing ? 'mise à jour' : 'envoyée'} avec succès.`);
+      setSubmissionForm({ testId: '', submittedFile: null, submissionId: '', isEditing: false });
       e.target.reset();
     } catch (error) {
-      console.error('Error submitting test:', error.response?.data || error.message);
+      console.error('Erreur lors de la soumission:', error.response?.data || error);
       setError(error.response?.data?.message || error.message || 'Erreur lors de la soumission du test.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEditSubmission = (testId, submission) => {
+    setSubmissionForm({
+      testId,
+      submittedFile: null,
+      submissionId: submission._id,
+      isEditing: true,
+    });
+  };
+
+  const handleDeleteSubmission = async (submissionId, testId) => {
+    if (!submissionId) {
+      setError('ID de soumission manquant ou invalide.');
+      console.error('Erreur : submissionId est undefined', { submissionId, testId });
+      return;
+    }
+
+    setError('');
+    setSuccess('');
+    setSubmitting(true);
+
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      await axios.delete(`https://kara-back.onrender.com/api/student/tests/submission/${submissionId}`, config);
+      setTests(tests.map(test =>
+        test._id === testId
+          ? { ...test, submission: null }
+          : test
+      ));
+      setSuccess('Soumission supprimée avec succès.');
+    } catch (error) {
+      console.error('Erreur lors de la suppression:', error.response?.data || error);
+      setError(error.response?.data?.message || 'Erreur lors de la suppression de la soumission.');
     } finally {
       setSubmitting(false);
     }
@@ -106,16 +144,13 @@ const StudentTests = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
       <header className="bg-gradient-to-r from-indigo-600 to-purple-600 shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold text-white">Mes Tests</h1>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -123,7 +158,6 @@ const StudentTests = () => {
           </div>
         )}
 
-        {/* Error Message */}
         {error && (
           <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg shadow-md">
             <div className="flex items-center">
@@ -135,7 +169,6 @@ const StudentTests = () => {
           </div>
         )}
 
-        {/* Success Message */}
         {success && (
           <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow-md">
             <div className="flex items-center">
@@ -147,22 +180,17 @@ const StudentTests = () => {
           </div>
         )}
 
-        {/* Action Bar */}
         <div className="mb-8">
           <button 
             onClick={goBack} 
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-300 flex items-center"
             title="Retour"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-                      🏠 Retour
-
+            <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+            Retour
           </button>
         </div>
 
-        {/* Tests Section */}
         <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-600 mb-6">
           Tests Disponibles
         </h2>
@@ -179,10 +207,7 @@ const StudentTests = () => {
             {tests.map(test => (
               <div key={test._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 <div className="p-6">
-                  {/* Test Header */}
                   <h3 className="text-xl font-bold text-indigo-800 mb-2">{test.title}</h3>
-                  
-                  {/* Test Details */}
                   <div className="space-y-2 mb-4">
                     <p className="flex items-start">
                       <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">Leçon</span>
@@ -202,7 +227,6 @@ const StudentTests = () => {
                     </p>
                   </div>
 
-                  {/* Test File */}
                   {test.mediaFile && (
                     <div className="mb-4">
                       <a
@@ -211,26 +235,24 @@ const StudentTests = () => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
                       >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                        </svg>
+                        <FontAwesomeIcon icon={faDownload} className="mr-2" />
                         Télécharger le test
                       </a>
                     </div>
                   )}
 
-                  {/* Submission Status */}
                   <div className={`mb-4 p-3 rounded-lg ${
-                    test.submission?.status === 'non soumis' 
+                    test.submission?.status === 'pending' 
                       ? 'bg-yellow-100 text-yellow-800' 
-                      : test.submission?.status === 'corrigé'
+                      : test.submission?.status === 'corrected'
                       ? 'bg-green-100 text-green-800'
-                      : 'bg-blue-100 text-blue-800'
+                      : test.submission?.status === 'submitted'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
                   }`}>
                     <span className="font-bold">Statut:</span> {test.submission?.status || 'non soumis'}
                   </div>
 
-                  {/* Submission Details */}
                   {test.submission?.submittedFile && (
                     <div className="mb-4">
                       <a
@@ -239,22 +261,18 @@ const StudentTests = () => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center text-purple-600 hover:text-purple-800 font-medium"
                       >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                        </svg>
+                        <FontAwesomeIcon icon={faDownload} className="mr-2" />
                         Voir ma soumission
                       </a>
                     </div>
                   )}
 
-                  {/* Feedback */}
                   {test.submission?.feedback && (
                     <div className="mb-4 bg-indigo-50 p-3 rounded-lg">
                       <span className="font-bold text-indigo-700">Feedback:</span> {test.submission.feedback}
                     </div>
                   )}
 
-                  {/* Correction */}
                   {test.submission?.correctionFile && (
                     <div className="mb-4">
                       <a
@@ -263,20 +281,17 @@ const StudentTests = () => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center text-green-600 hover:text-green-800 font-medium"
                       >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                        <FontAwesomeIcon icon={faDownload} className="mr-2" />
                         Télécharger la correction
                       </a>
                     </div>
                   )}
 
-                  {/* Submission Form */}
-                  {(!test.submission || test.submission?.status === 'non soumis') && (
-                    <form onSubmit={(e) => handleSubmit(e, test._id)} className="mt-4">
+                  {(!test.submission || (test.submission?.status !== 'corrected')) && (
+                    <form onSubmit={(e) => handleSubmit(e, test._id, test.submission?._id)} className="mt-4">
                       <div className="mb-4">
                         <label htmlFor={`file-${test._id}`} className="block text-sm font-medium text-gray-700 mb-2">
-                          Soumettre le test complété
+                          {test.submission ? 'Modifier la soumission' : 'Soumettre le test complété'}
                         </label>
                         <div className="flex items-center">
                           <label className="flex-1 cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium py-2 px-4 rounded-lg border border-blue-200 transition-colors duration-300">
@@ -285,14 +300,11 @@ const StudentTests = () => {
                               type="file"
                               accept="image/jpeg,image/png,application/pdf,audio/mpeg,audio/wav,audio/ogg"
                               onChange={handleFileChange}
-                              required
                               disabled={submitting}
                               className="hidden"
                             />
                             <div className="flex items-center justify-center">
-                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                              </svg>
+                              <FontAwesomeIcon icon={faUpload} className="mr-2" />
                               Choisir un fichier
                             </div>
                           </label>
@@ -300,21 +312,33 @@ const StudentTests = () => {
                       </div>
                       <button 
                         type="submit" 
-                        disabled={submitting}
+                        disabled={submitting || !submissionForm.submittedFile}
                         className={`w-full py-2 px-4 rounded-lg font-bold shadow-md transition-all duration-300 ${
-                          submitting
+                          submitting || !submissionForm.submittedFile
                             ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
                             : 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white transform hover:scale-105'
                         }`}
                       >
                         <div className="flex items-center justify-center">
-                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                          </svg>
-                          {submitting ? 'Soumission en cours...' : 'Soumettre'}
+                          <FontAwesomeIcon icon={faUpload} className="mr-2" />
+                          {submitting ? 'Soumission en cours...' : test.submission ? 'Mettre à jour' : 'Soumettre'}
                         </div>
                       </button>
                     </form>
+                  )}
+
+                  {test.submission && test.submission._id && test.submission.status !== 'corrected' && (
+                    <button
+                      onClick={() => {
+                        console.log('Submission avant suppression:', test.submission);
+                        handleDeleteSubmission(test.submission._id, test._id);
+                      }}
+                      disabled={submitting}
+                      className="mt-4 w-full py-2 px-4 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold shadow-md transition-all duration-300 flex items-center justify-center"
+                    >
+                      <FontAwesomeIcon icon={faTrash} className="mr-2" />
+                      Supprimer la soumission
+                    </button>
                   )}
                 </div>
               </div>

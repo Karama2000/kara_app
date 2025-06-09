@@ -18,7 +18,7 @@ const HeroOne = () => {
         <div className="flex flex-col items-center text-center relative z-10">
           <Title size={"7.5xl"} className={"font-normal max-w-[776px]"}>
             <span className="relative">Éveillez les esprits avec <span className="absolute -left-6 top-1 text-3xl text-[#0A6375]"><ThreeLine /></span></span>
-             <span className="font-bold text-destructive-foreground">karaScolaire</span>
+             <span className="font-bold text-destructive-foreground">KaraScolaire</span>
           </Title>
 
           <div className="flex absolute right-[87px] top-14 animate-skw">

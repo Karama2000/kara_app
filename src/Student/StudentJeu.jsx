@@ -86,7 +86,6 @@ const StudentJeu = () => {
       document.getElementById('screenshot-input').value = '';
       setError('');
       alert('Capture de score soumise avec succès');
-      // Rafraîchir les scores
       const res = await api.get('/api/student/scores/user', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         params: { gameId: selectedGame._id },
@@ -97,7 +96,7 @@ const StudentJeu = () => {
     }
   };
 
-return (
+  return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 p-4 md:p-8">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
@@ -106,14 +105,13 @@ return (
           className="flex items-center bg-yellow-400 hover:bg-yellow-500 text-purple-900 font-bold py-2 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
           title="Retour au tableau de bord"
         >
-                    🏠 Retour
-
+          🏠 Retour
         </button>
         <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
           Jeux Éducatifs
         </h2>
         <button
-          onClick={() => navigate('/student/games')}
+          onClick={() => navigate('/mes-scores')} // Changed from /student/games to /mes-scores
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
         >
           Voir mes scores

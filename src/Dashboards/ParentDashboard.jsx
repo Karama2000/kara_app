@@ -55,11 +55,7 @@ const ParentDashboard = () => {
       setUnreadMessages(messagesResponse.data.count || 0);
       const messagesData = Array.isArray(latestMessageResponse.data) ? latestMessageResponse.data : [];
       const unread = messagesData.filter(msg => !msg.read);
-      if (unread.length > 0) {
-        setLatestMessageSender(unread[0].sender?._id || null);
-      } else {
-        setLatestMessageSender(null);
-      }
+      setLatestMessageSender(unread.length > 0 ? unread[0].sender?._id || null : null);
       setError('');
     } catch (error) {
       console.error('Détails de l\'erreur:', error.response ? error.response.data : error.message);
@@ -76,7 +72,8 @@ const ParentDashboard = () => {
   useEffect(() => {
     if (token) {
       fetchData();
-      const interval = setInterval(fetchData, 10000);
+      // Increase polling interval to 30 seconds to reduce frequency
+      const interval = setInterval(fetchData, 30000);
       return () => clearInterval(interval);
     } else {
       navigate('/login');
@@ -122,8 +119,8 @@ const ParentDashboard = () => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const handleViewNotifications = () => navigate('/parent/notifications');
-  
-const sidebarLinks = [
+
+  const sidebarLinks = [
     { label: 'Tableau de Bord', path: '/parent-dashboard', icon: faHome, color: 'text-indigo-500' },
     { label: 'Progrès des enfants', path: '/parent/progress', icon: faChartLine, color: 'text-emerald-500' },
     { label: 'Notifications', path: '/parent/notifications', icon: faBell, color: 'text-amber-500' },
@@ -131,7 +128,7 @@ const sidebarLinks = [
   ];
 
   return (
- <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
+    <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
       {/* Header */}
       <header className={`sticky top-0 z-10 ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border-b shadow-sm`}>
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -328,6 +325,9 @@ const sidebarLinks = [
                               src={child.imageUrl}
                               alt={`${child.prenom} ${child.nom}`}
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.src = 'https://via.placeholder.com/150'; // Fallback image
+                              }}
                             />
                           ) : (
                             <FontAwesomeIcon 

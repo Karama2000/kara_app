@@ -61,13 +61,13 @@ const TeacherDashboard = () => {
           messagesRes,
           notificationsRes
         ] = await Promise.all([
-          axios.get('https://kara-back.onrender.com/api/lessons', config),
-          axios.get('https://kara-back.onrender.com/api/tests', config),
-          axios.get('https://kara-back.onrender.com/api/tests/submissions', config),
-          axios.get('https://kara-back.onrender.com/api/categories', config),
-          axios.get('https://kara-back.onrender.com/api/vocab', config),
-          axios.get('https://kara-back.onrender.com/api/messages/unread-count', config),
-          axios.get('https://kara-back.onrender.com/api/notifications', config)
+          axios.get('https://karama-backend.onrender.com/api/lessons', config),
+          axios.get('https://karama-backend.onrender.com/api/tests', config),
+          axios.get('https://karama-backend.onrender.com/api/tests/submissions', config),
+          axios.get('https://karama-backend.onrender.com/api/categories', config),
+          axios.get('https://karama-backend.onrender.com/api/vocab', config),
+          axios.get('https://karama-backend.onrender.com/api/messages/unread-count', config),
+          axios.get('https://karama-backend.onrender.com/api/notifications', config)
         ]);
 
         const notificationsData = Array.isArray(notificationsRes.data.notifications)
@@ -174,11 +174,9 @@ const TeacherDashboard = () => {
       >
         <div className="absolute inset-0  opacity-70"></div>
         <div className="relative z-10 text-white">
-          <h2 className="text-2xl font-bold text-gray-900">Tableau de Bord Enseignant</h2>
-<p className="text-lg font-semibold text-gray-800">
-  Bonjour {prenom && nom ? `${prenom} ${nom}` : 'Enseignant'} !
-</p>
-  </div>
+          <h2 className="text-2xl font-bold">Tableau de Bord Enseignant</h2>
+          <p className="text-lg">Bonjour {prenom && nom ? `${prenom} ${nom}` : 'Enseignant'} !</p>
+        </div>
         <div className="relative z-10 flex items-center space-x-4">
           <button
             onClick={() => navigate('/teacher/messages')}

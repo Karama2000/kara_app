@@ -11,6 +11,8 @@ import Home from "./Pages/Home";
 import Services from "./Pages/Services";
 import About from "./Pages/About";
 import ResetPassword from "./Pages/ResetPassword";
+import Policiy from "./Pages/Policiy";
+import TermsConditions from "./Pages/TermsConditions";
 
 
 import ParentDashboard from "./Dashboards/ParentDashboard";
@@ -43,6 +45,8 @@ import ProgressionEleve from "./Enseignant/TeacherStudentProgress";
 import TeacherTest from "./Enseignant/TeacherTest";
 import NotifTeacher from "./Enseignant/NotifTeacher";
 import SuivreScore from "./Enseignant/SuivreScore";
+import ViewQuiz from "./Enseignant/ViewQuiz";
+
 
 import StudentLesson from "./Student/StudentLesson";
 import StudentVocab from "./Student/StudentVocab";
@@ -77,12 +81,16 @@ const router = createBrowserRouter([
           { path: "/services", element: <Services /> },
           { path: "/service-details", element: <ServiceDetails /> },
 
+          { path: "/terms-and-conditions", element: <TermsConditions /> },
+          { path: "/privacy-policy", element: <Policiy /> },
+          { path: "/contact", element: <Contact /> },
+
           { path: "/contact", element: <Contact /> },
           { path: "/login", element: <Login /> },
           { path: "/register", element: <Register /> },
           { path: "/reset-password", element: <ResetPassword /> },
           { path: "/reset-password/:token", element: <ResetPassword /> },
-        
+
 
         ],
       },

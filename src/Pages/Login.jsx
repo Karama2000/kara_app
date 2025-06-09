@@ -37,16 +37,7 @@ const Login = () => {
     } catch (error) {
       console.error('Erreur lors de la connexion:', error);
       const errorMessage = error.response?.data?.message || 'Erreur lors de la connexion';
-      if (errorMessage.includes('confirmer votre email')) {
-        setError(
-          <>
-            {errorMessage} <br />
-            <Link to="/resend-confirmation" className="text-blue-600 hover:underline">
-              Renvoyer l'email de confirmation
-            </Link>
-          </>
-        );
-      } else if (errorMessage.includes('en attente de validation')) {
+      if (errorMessage.includes('en attente de validation')) {
         setError(`${errorMessage}. Veuillez patienter ou contacter l'administrateur.`);
       } else {
         setError(errorMessage);
