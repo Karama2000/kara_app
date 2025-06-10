@@ -9,7 +9,7 @@ const CopyRight = ({ color }) => {  // Le composant accepte une prop 'color' pou
                 
                 {/* Affichage du texte de droit d'auteur avec animation de gauche à droite */}
                 <p className={cn('wow fadeInLeft', color)} data-wow-delay=".3s">  
-                    © <Link to="#">Yoursitename</Link> 2024 | Tous droits réservés
+                    © <Link to="http://localhost:3000/">KaraScolaire</Link> 2025 | Tous droits réservés
                 </p>
                 
                 {/* Liste des liens avec une animation de droite à gauche */}
